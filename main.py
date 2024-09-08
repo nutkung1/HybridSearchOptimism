@@ -56,9 +56,9 @@ class ResearchCrew:
             verbose=True,
         )
 
-        # result = crew.kickoff(inputs=self.inputs)
-        # self.serailized_result = self.serialize_crew_output(result)
-        # return {"result": self.serailized_result}
+        result = crew.kickoff(inputs=self.inputs)
+        self.serailized_result = self.serialize_crew_output(result)
+        return {"result": self.serailized_result}
         # Capture logs
         log_capture = io.StringIO()
         with redirect_stdout(log_capture):

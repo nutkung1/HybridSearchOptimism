@@ -20,6 +20,7 @@ from contextlib import redirect_stdout
 
 
 class ResearchCrew:
+
     def __init__(self, inputs):
         self.inputs = inputs
         self.agents = ResearchCrewAgents()
@@ -50,8 +51,8 @@ class ResearchCrew:
         )
 
         crew = Crew(
-            agents=[researcher, writer, conclude],
-            tasks=[research_task, writing_task, conclude_task],
+            agents=[researcher, writer],
+            tasks=[research_task, writing_task],
             process=Process.sequential,
             verbose=True,
         )
@@ -60,16 +61,16 @@ class ResearchCrew:
         self.serailized_result = self.serialize_crew_output(result)
         return {"result": self.serailized_result}
         # Capture logs
-        log_capture = io.StringIO()
-        with redirect_stdout(log_capture):
-            result = crew.kickoff(inputs=self.inputs)
+        # log_capture = io.StringIO()
+        # with redirect_stdout(log_capture):
+        #     result = crew.kickoff(inputs=self.inputs)
 
-        logs = log_capture.getvalue()
-        self.filenames = self.extract_filenames(logs)
-        print(f"Extracted Filenames: {self.filenames}")
-        self.serailized_result = self.serialize_crew_output(result)
-        self.citation = Citation().process_llm_response(self.filenames)
-        return {"result": self.serailized_result, "links": self.citation}
+        # logs = log_capture.getvalue()
+        # self.filenames = self.extract_filenames(logs)
+        # print(f"Extracted Filenames: {self.filenames}")
+        # self.serailized_result = self.serialize_crew_output(result)
+        # self.citation = Citation().process_llm_response(self.filenames)
+        # return {"result": self.serailized_result, "links": self.citation}
 
     def run_discord(self):
         researcher = self.agents.researcher()
@@ -119,6 +120,21 @@ def has_useful_information(output):
     return not any(phrase in output for phrase in USELESS_INFO_PHRASES)
 
 
+def map_input(user_input):
+    text = user_input.lower()
+    if any(x in text for x in ["retrofunding 1", "retrofunding 2", "retrofunding 3"]):
+        return text.replace("retrofunding", "retropgf")
+
+    elif any(x in text for x in ["retropgf 4", "retropgf 5"]):
+        return text.replace("retropgf", "retrofunding")
+
+    elif any(x in text for x in ["retrofund"]):
+        return text.replace("retrofund", "retrofunding")
+
+    else:
+        return user_input
+
+
 app = FastAPI()
 
 
@@ -129,8 +145,8 @@ async def ask_question(request: QuestionRequest):
         question = request.question
         if not question:
             raise HTTPException(status_code=400, detail="No question provided")
-
-        inputs = {"question": question}
+        mapped_question = map_input(question)
+        inputs = {"question": mapped_question}
         research_crew = ResearchCrew(inputs)
         result = research_crew.run()
         if has_useful_information(result["result"]):
@@ -150,11 +166,13 @@ async def ask_question_discord(request: QuestionRequest):
     start_time = time.time()
     try:
         question = request.question
+        mapped_question = map_input(question)
         if not question:
             raise HTTPException(status_code=400, detail="No question provided")
 
-        inputs = {"question": question}
-        research_crew = ResearchCrew(inputs)
+        inputs = {"question": mapped_question}
+        mappedinput = map_input(inputs)
+        research_crew = ResearchCrew(mappedinput)
         result = research_crew.run()
         if has_useful_information(result["result"]):
             return result

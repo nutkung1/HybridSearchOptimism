@@ -84,8 +84,8 @@ class ResearchCrew:
         )
 
         crew = Crew(
-            agents=[researcher, writer, conclude],
-            tasks=[research_task, writing_task, conclude_task],
+            agents=[researcher, writer],
+            tasks=[research_task, writing_task],
             process=Process.sequential,
             verbose=True,
         )

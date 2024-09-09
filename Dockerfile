@@ -18,8 +18,8 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install any dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies one by one (for debugging)
+RUN pip install --no-cache-dir <specific_package_from_requirements>
 
 # Copy the rest of the application code
 COPY . .

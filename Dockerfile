@@ -1,14 +1,18 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12-slim
-
-# Set the working directory in the container
-WORKDIR /app
+FROM python:3.12-slim AS builder
 
 # Install essential build dependencies (if required)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Upgrade pip and install PyTorch packages
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # Copy only the requirements file to leverage Docker cache
 COPY requirements.txt .

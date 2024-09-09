@@ -10,9 +10,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set the working directory in the container
 WORKDIR /app
 
-# Upgrade pip and install PyTorch packages
+# Upgrade pip
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Install the specific version of torch along with torchvision and torchaudio
+RUN pip install --no-cache-dir torch==2.4.1+cpu torchvision==0.19.1+cpu torchaudio==2.4.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
 # Copy only the requirements file to leverage Docker cache
 COPY requirements.txt .

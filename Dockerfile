@@ -4,7 +4,13 @@ FROM python:3.12-alpine AS builder
 # Install build dependencies
 RUN apk add --no-cache \
     build-base \
-    cmake
+    cmake \
+    libffi-dev \
+    openssl-dev \
+    musl-dev \
+    gcc \
+    g++ \
+    make
 
 # Set the working directory in the container
 WORKDIR /app

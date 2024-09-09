@@ -1,16 +1,11 @@
-# Use an official Python runtime as a parent image (Alpine version)
-FROM python:3.12-alpine AS builder
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim AS builder
 
 # Install build dependencies
-RUN apk add --no-cache \
-    build-base \
+RUN apt-get update && apt-get install -y \
+    build-essential \
     cmake \
-    libffi-dev \
-    openssl-dev \
-    musl-dev \
-    gcc \
-    g++ \
-    make
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /app
@@ -18,14 +13,14 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install dependencies one by one (for debugging)
-RUN pip install --no-cache-dir <specific_package_from_requirements>
+# Install any dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .
 
 # Final stage
-FROM python:3.12-alpine
+FROM python:3.12-slim
 
 # Set the working directory in the container
 WORKDIR /app

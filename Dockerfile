@@ -32,5 +32,8 @@ COPY --from=builder /app /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Command to run your application
-CMD ["python", "main.py"]
+# Expose port 8080 to the outside world
+EXPOSE 8080
+
+# Command to run your application with Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
